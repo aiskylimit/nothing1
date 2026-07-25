@@ -349,7 +349,7 @@ def finetune(args, tokenizer: AutoTokenizer, model, logit_adapter: nn.Module,
             loss_kd = anti_loss
             
             if anti_loss is not None:
-                tau = 1.0
+                k = 50
                 no_model_batch["label"] = no_model_batch["label"].to(logit_adapter.device)
 
                 hb_topk_logits, hb_topk_indices = torch.topk(h_base_logits, k, dim=-1)
