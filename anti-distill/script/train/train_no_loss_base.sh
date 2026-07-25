@@ -1,6 +1,6 @@
 #! /bin/bash
 
-GPUS=(2)
+GPUS=(2 6)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 
 MASTER_ADDR=localhost
@@ -27,7 +27,7 @@ DATA_DIR="${BASE_PATH}/processed_data/MetaMathQA-50k/qwen/"
 # hp
 BATCH_SIZE=8
 LR=0.0003
-GRAD_ACC=2
+GRAD_ACC=1
 EVAL_BATCH_SIZE=64
 EPOCHS=5
 # length

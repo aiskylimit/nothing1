@@ -361,7 +361,7 @@ def finetune(args, tokenizer: AutoTokenizer, model, logit_adapter: nn.Module,
                     n: p for n, p in logit_adapter.named_parameters() if p.requires_grad
                 }
                 bilevel_optimization(logit_adapter, loss, anti_loss, list(trainable_named_params.values()))
-                base_loss = base_loss.detach()
+                base_loss = h_base_loss.detach()
                 logit_adapter.step()
             else:
                 pass
