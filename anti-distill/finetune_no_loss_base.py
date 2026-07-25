@@ -518,7 +518,7 @@ def main():
     
     if args.student_model_path is not None:
         student_base_model = get_student_model(args, device)
-        # student_base_model.resize_token_embeddings(model.config.vocab_size)
+        student_base_model.resize_token_embeddings(model.config.vocab_size)
         # peft_config = LoraConfig(
         #     task_type=TaskType.CAUSAL_LM, 
         #     inference_mode=False, 
