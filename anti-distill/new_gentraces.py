@@ -1,0 +1,531 @@
+import json
+import logging
+import os
+import socket
+import random
+import shutil
+import tempfile
+from io import StringIO
+from pathlib import Path
+
+import datasets
+import hydra
+import torch
+import yaml
+from accelerate import Accelerator
+from accelerate.utils import gather_object
+from hydra.core.hydra_config import HydraConfig
+from math_verify import parse, verify
+from omegaconf import DictConfig, OmegaConf
+from rich.console import Console
+from rich.panel import Panel
+from rich.syntax import Syntax
+from torch.nn import functional as F
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          DataCollatorWithPadding, LogitsProcessor,
+                          LogitsProcessorList)
+from transformers import logging as hf_logging
+from peft import PeftModel
+
+import wandb
+from utils import (ANSWER_FORCE_STRING, SYSTEM_PROMPT, MMLU_SYSTEM_PROMPT, init, load_gsm8k,
+                   load_hendrycks_math_dataset, load_mmlu, load_metamath)
+from logit_adapter import LogitAdapter
+
+# ================================================================================
+# SETUP AND INITIALIZATION
+# ================================================================================
+accelerator = Accelerator()
+log = logging.getLogger(__name__)
+
+# Disable verbose logging for non-main processes to reduce noise
+if not accelerator.is_main_process:
+    hf_logging.set_verbosity_error()
+    hf_logging.disable_progress_bar()
+    datasets.disable_progress_bar()
+    tqdm = lambda x, *args, **kwargs: x
+
+# ================================================================================
+# UTILITY FUNCTIONS
+# ================================================================================
+
+def log_color(content, title=""):
+    """Enhanced logging with colored console output for main process."""
+    try:
+        console = Console()
+        console.print(Panel(content, title=title, border_style="cyan", title_align="left"))
+
+        # Log the message as plain text for log files
+        string_io = StringIO()
+        plain_console = Console(file=string_io, highlight=False)
+        plain_console.print(Panel(content, title=title, border_style="none", title_align="left"))
+        log.info("\n" + string_io.getvalue())
+    except Exception as e:
+        # Fallback to plain text logging if Console fails
+        log.info(f"Error logging content: {e}")
+
+def is_correct(example, trace_colname):
+    """
+    Evaluate if a generated trace produces the correct answer for a math problem.
+    
+    Uses math_verify to parse and compare solutions. Handles cases where the 
+    answer forcing string splits the response.
+    """
+    trace = example[trace_colname]
+    try:
+        soln = parse(example["solution"])
+        if ANSWER_FORCE_STRING in trace:
+            # Handle answer forcing: try multiple ways to extract the answer
+            parts = trace.split(ANSWER_FORCE_STRING)
+            alt_ans2 = ANSWER_FORCE_STRING + parts[-1]
+            res = verify(soln, parse(alt_ans2))
+        else:
+            res = verify(soln, parse(trace))
+    except:
+        print(f"Error parsing trace: {trace} and comparing with solution: {example['solution']}")
+        res = False
+    return {"is_correct": res}
+
+
+from transformers import Qwen2ForCausalLM
+from transformers.modeling_outputs import CausalLMOutputWithPast
+
+class CustomModel(Qwen2ForCausalLM):
+    def setup_logit_adapter(self, logit_adapter: LogitAdapter, temperature=1.0, top_k=50, top_p=0.95, do_sample=True, delta=1.0):
+        self.logit_adapter = logit_adapter.to(dtype=self.dtype, device=self.device)
+        self.ids_adapted = [] 
+        self.temperature = temperature
+        self.temperature = 0.9
+        self.top_k = top_k
+        self.top_p = top_p
+        self.do_sample = do_sample
+        self.delta = delta
+
+    def forward(
+        self,
+        input_ids = None,
+        attention_mask = None,
+        position_ids = None,
+        past_key_values = None,
+        inputs_embeds = None,
+        labels = None,
+        use_cache = None,
+        cache_position = None,
+        logits_to_keep = 0,
+        **kwargs,
+    ) -> CausalLMOutputWithPast:
+        
+        outputs = self.model(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            position_ids=position_ids,
+            past_key_values=past_key_values,
+            inputs_embeds=inputs_embeds,
+            use_cache=use_cache,
+            cache_position=cache_position,
+            **kwargs,
+        )
+
+        hidden_states = outputs.last_hidden_state
+        # Only compute necessary logits, and do not upcast them to float if we are not computing the loss
+        slice_indices = slice(-logits_to_keep, None) if isinstance(logits_to_keep, int) else logits_to_keep
+
+        logits = self.lm_head(hidden_states[:, slice_indices, :])
+
+        new_logits = self.logit_adapter(hidden_states[:, slice_indices, :])
+
+        logits = (logits + self.delta * new_logits)
+        # logits = torch.log((F.softmax(logits, dim=-1) + self.delta * F.softmax(new_logits, dim=-1)) / (1 + self.delta)) 
+
+        # logits = self.logit_adapter(hidden_states[:, slice_indices, :])
+
+        loss = None
+        if labels is not None:
+            loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
+
+        return CausalLMOutputWithPast(
+            loss=loss,
+            logits=logits,
+            past_key_values=outputs.past_key_values,
+            hidden_states=outputs.hidden_states,
+            attentions=outputs.attentions,
+        )
+    
+    def free(self):
+        del self.ids_adapted
+        torch.cuda.empty_cache()
+        self.ids_adapted = []
+
+
+# ================================================================================
+# MAIN TRACE GENERATION FUNCTION
+# ================================================================================
+
+@hydra.main(config_path=".", config_name="gen_config", version_base="1.3")
+def main(cfg: DictConfig):
+
+    # ============================================================================
+    # CONFIGURATION VALIDATION AND SETUP
+    # ============================================================================
+    cfg.antidistillation = cfg.lam != 0
+    cfg.wandb_lam = 1e-8 if cfg.lam == 0 else cfg.lam  # Wandb doesn't allow log scale for 0 values
+    
+    # Validate antidistillation requirements
+    if cfg.antidistillation:
+        assert cfg.proxy_student is not None, "Proxy student model must be specified for antidistillation"
+        assert cfg.grad_path is not None, "Grad path must be specified for antidistillation"
+
+    if cfg.trace_name == "REPLACE_ME":
+        raise ValueError("Trace name must be specified")
+
+    # Initialize random seeds and logging
+    init(os.getenv("USER"), cfg.seed, "babel" in socket.gethostname())
+
+    if accelerator.is_main_process:
+        content = Syntax(OmegaConf.to_yaml(cfg, resolve=True), 'yaml', theme="monokai")
+        log_color(content, title="Config")
+
+    # ============================================================================
+    # TOKENIZER SETUP
+    # ============================================================================
+    # Configure tokenizer with proper padding and special tokens for different model families
+    tokenizer = AutoTokenizer.from_pretrained(
+        cfg.tokenizer,
+        use_fast=True,
+        fast_tokenizer=True,
+        trust_remote_code=True,
+        padding_side="left",  # Left padding for generation
+    )
+    
+    # Model-specific tokenizer configuration
+    if "llama" in cfg.tokenizer.lower():
+        eot_token_id = 128009
+        eos_token_id = 128001
+        tokenizer.pad_token_id = 128004
+        tokenizer.eos_token_id = eos_token_id
+        tokenizer.add_eos_token = False
+        eos_token = tokenizer.eos_token
+    else:
+        eos_token = tokenizer.eos_token
+        bos_token = tokenizer.bos_token or ""
+        # special_tokens = {"pad_token": "[PAD]"}
+        # tokenizer.add_special_tokens(special_tokens)
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+
+    # ============================================================================
+    # TEACHER MODEL SETUP
+    # ============================================================================
+    # Load the teacher model that will generate the reasoning traces
+
+    teacher = CustomModel.from_pretrained(
+        "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        trust_remote_code=True,
+        attn_implementation="sdpa",  # Use PyTorch SDPA instead of Flash Attention
+        # attn_implementation="flash_attention_2",
+        torch_dtype=torch.bfloat16,
+        use_cache=True,
+    ).to(accelerator.device)
+        
+    logit_adapter_path = os.path.join(cfg.teacher, "logit_adapter.pt")
+    logit_adapter = LogitAdapter.load(logit_adapter_path, map_location='cpu')
+    teacher.setup_logit_adapter(logit_adapter)
+    teacher.generation_config.pad_token_id = tokenizer.pad_token_id
+    teacher.temperature = cfg.tau if cfg.tau > 0 else None
+    teacher.do_sample = True if cfg.tau > 0 else False
+    teacher.delta = cfg.delta
+
+
+    # ============================================================================
+    # DATASET LOADING AND PREPROCESSING
+    # ============================================================================
+    # Load the appropriate dataset based on configuration
+    sys_prompt = SYSTEM_PROMPT
+    if "gsm8k" in cfg.data_split:
+        dataset = load_gsm8k(split=cfg.data_split.split("_")[1])
+    elif "metamath" in cfg.data_split:
+        dataset = load_metamath(split=cfg.data_split.split("_")[1])
+    elif "math" in cfg.data_split:
+        dataset = load_hendrycks_math_dataset(split=cfg.data_split.split("_")[2])
+    elif "mmlu" in cfg.data_split:
+        dataset = load_mmlu(split=cfg.data_split.split("_")[1])   
+        sys_prompt = MMLU_SYSTEM_PROMPT
+    else:
+        raise ValueError(f"Unknown dataset and split: {cfg.data_split}")
+    
+    def preprocess_function(examples):
+        messages = [
+            [
+                {"role": "system", "content": sys_prompt},
+                {"role": "user", "content": problem.strip() + "\n"}
+            ] 
+            for problem in examples["problem"]
+        ]
+        
+        tokens = [
+            tokenizer.apply_chat_template(msg, add_generation_prompt=True, return_dict=False)
+            for msg in messages
+        ]
+        
+        seq_lengths = [len(toks) for toks in tokens]
+        return {"input_ids": tokens, "seq_lengths": seq_lengths}
+
+    proc_dataset = dataset.map(
+        preprocess_function,
+        batched=True,
+        num_proc=4,
+        desc="Preprocessing dataset",
+        load_from_cache_file=True,
+    )
+    # Filter out sequences that are too long
+    proc_dataset = proc_dataset.filter(lambda x: x["seq_lengths"] <= cfg.max_prompt_length)
+    print("proc_dataset", len(proc_dataset))
+    # Limit dataset size if specified
+    if cfg.max_samples is not None:
+        proc_dataset = proc_dataset.take(min(cfg.max_samples, len(proc_dataset)))
+    log_color(tokenizer.decode(proc_dataset[0]['input_ids']), title="Example Input")
+    seq_length_stats = proc_dataset.to_pandas()["seq_lengths"].describe()
+    log_color(str(seq_length_stats.round(2)), title="Sequence Lengths")
+    proc_dataset = proc_dataset.remove_columns("seq_lengths")
+
+    # Shard dataset across multiple processes for distributed processing
+    num_shards = accelerator.num_processes
+    shard_id = accelerator.process_index
+    dataset_shard = proc_dataset.shard(num_shards=num_shards, index=shard_id)
+    ptds_shard = dataset_shard.remove_columns(dataset.column_names)
+
+    # Create dataloader for batch processing
+    dataloader = DataLoader(
+        ptds_shard,
+        batch_size=cfg.batch_size,
+        shuffle=False,
+        collate_fn=DataCollatorWithPadding(tokenizer=tokenizer)
+    )
+
+    # ============================================================================
+    # TRACE GENERATION LOOP
+    # ============================================================================
+    # Generate reasoning traces for each batch in the dataset
+    traces = []
+    for batch in tqdm(dataloader, total=len(dataloader), desc=f"tau={cfg.tau:.2e}, lam={cfg.lam:.2e}, eps={cfg.eps:.2e}"):
+        batch = {key: value.to(accelerator.device) for key, value in batch.items()}
+        with torch.inference_mode():
+            outputs = teacher.generate(
+                **batch,
+                max_new_tokens=None,
+                max_length=cfg.max_length,
+                temperature=cfg.tau if cfg.tau > 0 else None,
+                do_sample=True if cfg.tau > 0 else False,
+                top_p=cfg.top_p if cfg.tau > 0 else None,
+                top_k=cfg.top_k if cfg.tau > 0 else None,
+                renormalize_logits=True if cfg.antidistillation else False,
+                use_cache=True,
+                eos_token_id=tokenizer.eos_token_id,
+                repetition_penalty=1.0 if cfg.antidistillation else cfg.repetition_penalty,
+            )
+            generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=False)
+            for text in generated_texts:
+                text = text.replace(tokenizer.pad_token, "")
+                traces.append(text)
+
+    if accelerator.is_main_process:
+        log_color(traces[0], title="First trace")
+    
+    # Add generated traces to dataset and clean up GPU memory
+    dataset_shard = dataset_shard.add_column(cfg.trace_colname, traces)
+    if cfg.antidistillation:
+        del student, dstudent
+        torch.cuda.empty_cache()
+
+    # ============================================================================
+    # CORRECTNESS EVALUATION
+    # ============================================================================
+    # Evaluate correctness of the raw generated traces
+    dataset_shard = dataset_shard.map(
+        is_correct,
+        fn_kwargs={"trace_colname": cfg.trace_colname},
+        desc="Checking raw correctness"
+    )
+    dataset_shard = dataset_shard.rename_columns({"is_correct": "is_raw_correct"})
+
+    # ============================================================================
+    # ANSWER FORCING (OPTIONAL)
+    # ============================================================================
+    # Answer forcing improves trace quality by explicitly prompting for a final answer
+    # after the reasoning is complete
+    
+    # Detect the response string format based on model architecture
+    response_strings = {
+        "llama": "<|start_header_id|>assistant<|end_header_id|>\n\n",
+        "qwen": "<|im_start|>assistant\n",
+        "r1": "<｜Assistant｜>"
+    }
+    response_string = None
+    for _, value in response_strings.items():
+        if value in traces[0]:
+            response_string = value
+            break
+    if response_string is None:
+        raise ValueError("Response string not found in tokenizer chat template")
+    
+    if cfg.answer_force:
+        # Prepare traces for answer forcing by adding the forcing string
+        traces_ = []
+        for text in traces:
+            if "</think>" in text.split(response_string)[-1]:
+                traces_.append(text + ANSWER_FORCE_STRING)
+            else:
+                traces_.append(text + "\n</think>" + ANSWER_FORCE_STRING)
+        
+        # Process in smaller batches to generate final answers
+        af_batch_size = cfg.batch_size // 4
+        traces_batched = [traces_[i:i+af_batch_size] for i in range(0, len(traces_), af_batch_size)]
+        traces_af = []
+        for batch in tqdm(traces_batched, total=len(traces_batched)):
+            batch = [text.replace(bos_token, '', 1).replace(eos_token, '') for text in batch]
+            inputs = tokenizer(batch, return_tensors="pt", padding=True).to(accelerator.device)
+            with torch.inference_mode():
+                # Generate final answer without antidistillation (deterministic)
+                outputs = teacher.generate(
+                    **inputs,
+                    do_sample=False,
+                    temperature=None,
+                    top_p=None,
+                    logits_processor=None,
+                    renormalize_logits=False,
+                    max_new_tokens=32,
+                    use_cache=True,
+                    eos_token_id=tokenizer.eos_token_id
+                )
+                generated_texts = tokenizer.batch_decode(outputs, skip_special_tokens=False)
+                for text in generated_texts:
+                    text = text.replace(tokenizer.pad_token, "")
+                    if not text.endswith(tokenizer.eos_token):
+                        text = text + tokenizer.eos_token
+                    traces_af.append(text)
+
+        if accelerator.is_main_process:
+            log_color(traces_af[0], title="First af trace")
+        del teacher
+        torch.cuda.empty_cache()
+
+        # Add answer-forced traces and evaluate their correctness
+        dataset_shard = dataset_shard.add_column(cfg.trace_colname+"_af", traces_af)
+        dataset_shard = dataset_shard.map(
+            is_correct,
+            fn_kwargs={"trace_colname": cfg.trace_colname+"_af"},
+            desc="Checking af correctness"
+        )
+        dataset_shard = dataset_shard.rename_columns({"is_correct": "is_af_correct"})
+
+    # ============================================================================
+    # DATASET SAVING AND AGGREGATION
+    # ============================================================================
+    # Save dataset shards temporarily and then aggregate on main process
+    tmp_dir = Path(tempfile.mkdtemp(prefix="tmp_ds_"))
+    shard_path = tmp_dir / f"shard_rank_{accelerator.process_index:05d}"
+    dataset_shard.save_to_disk(shard_path)
+
+    accelerator.wait_for_everyone()
+
+    # Gather all shard paths and concatenate datasets on main process
+    all_paths = gather_object([shard_path])
+    if accelerator.is_main_process:
+        trace_dataset = datasets.concatenate_datasets([datasets.load_from_disk(path) for path in all_paths])
+
+        # Save final dataset in multiple formats
+        trace_dataset.save_to_disk(cfg.trace_path)
+        trace_dataset.to_parquet(cfg.trace_path + ".parquet")
+
+        # Clean up temporary files
+        for path in all_paths:
+            shutil.rmtree(path, ignore_errors=True)
+
+        # ========================================================================
+        # RESULTS LOGGING AND STATISTICS
+        # ========================================================================
+        # Display example results
+        example_row = trace_dataset[random.randint(0, len(trace_dataset)-1)]
+        log_color(example_row["problem"], title="Example Problem")
+        log_color(example_row["solution"], title="Example Solution")
+        log_color(example_row[cfg.trace_colname], title=f"Example Trace [tau={cfg.tau:.2e}, lam={cfg.lam:.2e}, eps={cfg.eps:.2e}]")
+        if cfg.answer_force:
+            log_color(example_row[cfg.trace_colname + "_af"], title=f"Example AF Trace [tau={cfg.tau:.2e}, lam={cfg.lam:.2e}, eps={cfg.eps:.2e}]")
+
+        # Compute performance statistics
+        trace_df = trace_dataset.to_pandas()
+        trace_len_stats = {k:float(v) for k,v in trace_df[cfg.trace_colname].map(lambda x: len(tokenizer.encode(x))).describe().items()}
+        raw_accuracy = float(trace_df["is_raw_correct"].mean())
+        af_accuracy = float(trace_df["is_af_correct"].mean())
+
+        # Prepare complete configuration with results
+        full_cfg = OmegaConf.to_container(cfg, resolve=True)
+        hydra_cfg = HydraConfig.get()
+        full_cfg["hydra"] = {
+            "run_dir": hydra_cfg.run.dir,
+            "job_name": hydra_cfg.job.name,
+            "cwd": hydra_cfg.runtime.cwd,
+        }
+        full_cfg["stats"] = {
+            "raw_accuracy": raw_accuracy,
+            "af_accuracy": af_accuracy,
+            "trace_len_stats": trace_len_stats,
+        }
+        
+        # Save configuration and results
+        yaml_path = cfg.trace_path + ".yaml"
+        with open(yaml_path, "w") as f:
+            OmegaConf.save(full_cfg, f)
+        log.info(f"Configuration saved to {yaml_path}")
+
+        # Append metadata to registry for experiment tracking
+        def flatten_dict(d, parent_key='', sep='.'):
+            items = []
+            for k, v in d.items():
+                new_key = f"{parent_key}{sep}{k}" if parent_key else k
+                if isinstance(v, dict):
+                    items.extend(flatten_dict(v, new_key, sep=sep).items())
+                else:
+                    items.append((new_key, v))
+            return dict(items)
+
+        with open(cfg.trace_registry, "a") as f:  # jsonl
+            f.write(json.dumps(flatten_dict(full_cfg)) + "\n")
+        log.info(f"Metadata appended to {cfg.trace_registry}")
+
+        content = Syntax(OmegaConf.to_yaml(full_cfg, resolve=True), 'yaml', theme="monokai")
+        log_color(content, title="Final Config")
+
+        # ========================================================================
+        # WANDB LOGGING (OPTIONAL)
+        # ========================================================================
+        # Log results to Weights & Biases if enabled
+        if cfg.use_wandb and cfg.teacher_cfg:
+            with open(cfg.teacher_cfg, "r") as f:
+                teacher_cfg = yaml.safe_load(f)
+            wandb_run_id = teacher_cfg.get("wandb_run_id")
+            if wandb_run_id is None:
+                raise ValueError("wandb is true but wandb_run_id not found in teacher config")
+            wandb.init(
+                project="antidistillation",
+                id=wandb_run_id,
+                resume="allow",
+            )
+            if cfg.is_teacher:
+                wandb.log({
+                    "teacher_raw_accuracy": raw_accuracy,
+                    "teacher_af_accuracy": af_accuracy,
+                })
+            else:
+                wandb.log({
+                    "student_raw_accuracy": raw_accuracy,
+                    "student_af_accuracy": af_accuracy,
+                })
+    
+    accelerator.wait_for_everyone()
+    accelerator.end_training()
+
+if __name__ == "__main__":
+    main()
