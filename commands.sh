@@ -1,4 +1,4 @@
-#1 +120
+#1 +10
 #anti-distill-2
 #v1
 
@@ -31,4 +31,4 @@ cd ./anti-distill
 # bash ./collect_results.sh
 # ls results/DeepSeek-R1-Distill-Qwen-7B-seed62 -R
 # ls experiments_gsm8k_4 -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
