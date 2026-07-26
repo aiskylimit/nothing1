@@ -1,7 +1,8 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing/anti-distill/results_yaml/ +a
+#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
 #anti-distill-2
 #v2
 
+#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
 
 # wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
 # sudo dpkg -i cuda-keyring_1.1-1_all.deb
