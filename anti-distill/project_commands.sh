@@ -23,8 +23,8 @@ hf auth login --token "hf_${RAW}"
 
 bash ./script/eval/gsm8k/run_eval_4.sh &
 bash ./script/eval/gsm8k/run_eval_5.sh &
-bash ./script/eval/gsm8k/run_eval_6.sh &
-bash ./script/eval/gsm8k/run_eval_7.sh &
+# bash ./script/eval/gsm8k/run_eval_6.sh &
+# bash ./script/eval/gsm8k/run_eval_7.sh &
 
 wait
 
