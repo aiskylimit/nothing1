@@ -1,5 +1,5 @@
-#2
-#anti-distill
+#1 +60
+#anti-distill-2
 #v2
 
 
@@ -25,6 +25,6 @@ conda activate base
 export PATH=/usr/local/cuda/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
-# cd ./anti-distill
+cd ./anti-distill
 # # ls -R
-# bash ./project_commands.sh
+bash ./project_commands.sh
