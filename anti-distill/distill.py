@@ -147,7 +147,7 @@ def main(cfg: DictConfig):
         cfg.student,
         trust_remote_code=True,
         # attn_implementation="sdpa",  # Use PyTorch SDPA instead of Flash Attention
-        attn_implementation="flash_attention_2",
+        # attn_implementation="flash_attention_2",
         torch_dtype=torch.bfloat16,  # Mixed precision for memory efficiency
         use_cache=True,
     )

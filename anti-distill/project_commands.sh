@@ -22,3 +22,5 @@ bash ./script/eval/gsm8k/run_eval_2.sh &
 bash ./script/eval/gsm8k/run_eval_3.sh &
 
 wait
+
+bash ./collect_results.sh
