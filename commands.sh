@@ -1,4 +1,4 @@
-#1 +120
+#1 +10
 #anti-distill-2
 #v2
 
@@ -30,4 +30,4 @@ cd ./anti-distill
 # bash ./collect_results.sh
 # ls experiments_gsm8k_5 -R
 # ls experiments_gsm8k_4 -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
