@@ -1,4 +1,4 @@
-#1 +10
+#2 +a
 #anti-distill-2
 #v2
 
