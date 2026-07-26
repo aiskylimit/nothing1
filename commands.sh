@@ -1,4 +1,4 @@
-#1 +10
+#1 +60
 #anti-distill-2
 #v2
 
@@ -17,8 +17,8 @@
 # make CUDAPATH=/usr/local/cuda-13.0
 # ./gpu_burn 36000000000
 
-# kill -9 $(nvidia-smi --query-compute-apps=pid --format=csv,noheader)
-# sleep 10
+kill -9 $(nvidia-smi --query-compute-apps=pid --format=csv,noheader)
+sleep 10
 nvidia-smi
 
 source ~/miniconda3/etc/profile.d/conda.sh
@@ -30,4 +30,5 @@ cd ./anti-distill
 # bash ./collect_results.sh
 # ls experiments_gsm8k_5 -R
 # ls experiments_gsm8k_4 -R
-# bash ./project_commands.sh
+bash ./project_commands.sh
+bash ./collect_results.sh

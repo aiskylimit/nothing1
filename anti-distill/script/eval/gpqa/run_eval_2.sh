@@ -18,7 +18,7 @@ for pair in "${pairs[@]}"; do
     echo "=========================================================================="
 
     echo ">>> [1/4] Eval Teacher with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config.yaml --main_process_port 0 "$gen"  \
+    accelerate launch --config_file acc_config_2.yaml --main_process_port 0 "$gen"  \
     hydra.run.dir=experiments_gpqa_cala/metadata/eval/lora_teacher_tau${tau}_delta${delta} \
     is_teacher=true exp_dir=experiments_gpqa_cala answer_force=true tau=${tau} \
     data_split=gpqa_test batch_size=256 trace_name=eval_teacher_lora_tau${tau}_delta${delta} seed=42 \
@@ -38,7 +38,7 @@ for pair in "${pairs[@]}"; do
     tau=${tau} seed=42 delta=${delta} max_samples=2880 
 
     echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config.yaml --main_process_port 0 distill.py \
+    accelerate launch --config_file acc_config_2.yaml --main_process_port 0 distill.py \
     hydra.run.dir=experiments_gpqa_cala/metadata/distill/lora_teacher \
     student=meta-llama/Llama-3.2-3B \
     tokenizer=meta-llama/Llama-3.2-3B-Instruct \
@@ -48,7 +48,7 @@ for pair in "${pairs[@]}"; do
     model_name=student_manua_tau${tau}_delta${delta}
 
     echo ">>> [4/4] Eval Student model with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config.yaml --main_process_port 0 student_eval.py  \
+    accelerate launch --config_file acc_config_2.yaml --main_process_port 0 student_eval.py  \
     hydra.run.dir=experiments_gpqa_cala/metadata/eval/student_mmlu \
     teacher=experiments_gpqa_cala/models/student_manua_tau${tau}_delta${delta}/final \
     is_teacher=false exp_dir=experiments_gpqa_cala answer_force=true \
