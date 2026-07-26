@@ -27,8 +27,8 @@ export PATH=/usr/local/cuda/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 cd ./anti-distill
-rm -rf results_yaml
-bash ./collect_results.sh
-# ls experiments_gsm8k_5 -R
+# rm -rf results_yaml
+# bash ./collect_results.sh
+ls results/DeepSeek-R1-Distill-Qwen-7B-seed62 -R
 # ls experiments_gsm8k_4 -R
 # bash ./project_commands.sh
