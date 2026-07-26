@@ -219,13 +219,21 @@ def main(cfg: DictConfig):
     t_tokenizer = AutoTokenizer.from_pretrained("deepseek-ai/DeepSeek-R1-Distill-Qwen-7B")
 
     def preprocess_function(examples):
-        messages = [
-            [
-                {"role": "system", "content": sys_prompt},
-                {"role": "user", "content": problem.strip() + "\n"}
-            ] 
-            for problem in examples["problem"]
-        ]
+        if "gemma" in cfg.tokenizer.lower():
+            messages = [
+                [
+                    {"role": "user", "content": sys_prompt + "\n\nPromblem:\n" + problem.strip() + "\n"}
+                ] 
+                for problem in examples["problem"]
+            ]
+        else:
+            messages = [
+                [
+                    {"role": "system", "content": sys_prompt},
+                    {"role": "user", "content": problem.strip() + "\n"}
+                ] 
+                for problem in examples["problem"]
+            ]
         
         tokens = [
             tokenizer.apply_chat_template(msg, add_generation_prompt=True, return_dict=False)

@@ -207,13 +207,17 @@ def main(cfg: DictConfig):
                 fixed_response = response + tokenizer.eos_token
                 responses.append(fixed_response)
 
-        
-        # Create chat format messages for each example
-        messages = [[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": problem.strip()},
+        if "gemma" in cfg.tokenizer.lower():
+            messages = [[
+            {"role": "user", "content": SYSTEM_PROMPT + "\n\nPromblem:\n" + problem.strip() + "\n"},
             {"role": "assistant", "content": response.strip()}]
             for problem, response in zip(examples["problem"], responses)]
+        else:
+            messages = [[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": problem.strip()},
+                {"role": "assistant", "content": response.strip()}]
+                for problem, response in zip(examples["problem"], responses)]
         
         # Apply chat template and tokenize
         tokens = tokenizer.apply_chat_template(messages, add_generation_prompt=False, return_dict=False)

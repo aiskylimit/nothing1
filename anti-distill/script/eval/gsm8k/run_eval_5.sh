@@ -19,8 +19,8 @@ for pair in "${pairs[@]}"; do
 
     echo ">>> [1/4] Eval Teacher with delta = ${delta} and tau = ${tau}..."
     accelerate launch --config_file acc_config_5.yaml --main_process_port 0 "$gen"  \
-    hydra.run.dir=experiments_gsm8k_5/metadata/eval/lora_teacher_tau${tau}_delta${delta} \
-    is_teacher=true exp_dir=experiments_gsm8k_5 answer_force=true tau=${tau} \
+    hydra.run.dir=experiments_gsm8k_gemma_tau/metadata/eval/lora_teacher_tau${tau}_delta${delta} \
+    is_teacher=true exp_dir=experiments_gsm8k_gemma_tau answer_force=true tau=${tau} \
     data_split=gsm8k_test batch_size=256 trace_name=eval_teacher_lora_tau${tau}_delta${delta} seed=42 \
     tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
     teacher=${teacher} delta=${delta} max_samples=2880 
@@ -28,7 +28,7 @@ for pair in "${pairs[@]}"; do
     echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
     python "$gen" \
     trace_name=teacher_lora_tau${tau}_delta${delta} \
-    trace_path=./experiments_gsm8k_5/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
+    trace_path=./experiments_gsm8k_gemma_tau/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
     data_split=gsm8k_train \
     teacher=${teacher} \
     tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
@@ -40,19 +40,19 @@ for pair in "${pairs[@]}"; do
 
     echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
     accelerate launch --config_file acc_config_5.yaml --main_process_port 0 distill.py \
-    hydra.run.dir=experiments_gsm8k_5/metadata/distill/lora_teacher \
+    hydra.run.dir=experiments_gsm8k_gemma_tau/metadata/distill/lora_teacher \
     student=google/gemma-2b-it \
     tokenizer=google/gemma-2b-it \
-    exp_dir=experiments_gsm8k_5 \
-    train_traces=experiments_gsm8k_5/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
+    exp_dir=experiments_gsm8k_gemma_tau \
+    train_traces=experiments_gsm8k_gemma_tau/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
     holdout_traces=traces_holdout \
     model_name=student_manua_tau${tau}_delta${delta} max_length=1025
 
     echo ">>> [4/4] Eval Student model with delta = ${delta} and tau = ${tau}..."
     accelerate launch --config_file acc_config_5.yaml --main_process_port 0 student_eval.py  \
-    hydra.run.dir=experiments_gsm8k_5/metadata/eval/student_gsm8k \
-    teacher=experiments_gsm8k_5/models/student_manua_tau${tau}_delta${delta}/final \
-    is_teacher=false exp_dir=experiments_gsm8k_5 answer_force=true \
+    hydra.run.dir=experiments_gsm8k_gemma_tau/metadata/eval/student_gsm8k \
+    teacher=experiments_gsm8k_gemma_tau/models/student_manua_tau${tau}_delta${delta}/final \
+    is_teacher=false exp_dir=experiments_gsm8k_gemma_tau answer_force=true \
     data_split=gsm8k_test batch_size=256 max_samples=2880 \
     trace_name=eval_student_gsm8k_tau${tau}_delta${delta} seed=42
 

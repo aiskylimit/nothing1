@@ -31,4 +31,5 @@ bash ./script/train/train_teacher_lora.sh &
 
 wait
 
+rm -rf results_yaml
 bash ./collect_results.sh
