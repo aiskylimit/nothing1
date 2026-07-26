@@ -272,6 +272,8 @@ def main(cfg: DictConfig):
         response_string = "<|start_header_id|>assistant<|end_header_id|>\n\n"
     elif "qwen" in cfg.student.lower():
         response_string = "<|im_start|>assistant\n"
+    elif "gemma" in cfg.student.lower():
+        response_string = "<start_of_turn>model\n"
     else:
         raise ValueError(f"Unknown model {cfg.student}")
     

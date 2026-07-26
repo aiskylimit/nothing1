@@ -17,18 +17,18 @@ for pair in "${pairs[@]}"; do
     echo " START PIPELINE WITH DELTA = ${delta} AND TAU = ${tau}"
     echo "=========================================================================="
 
-    echo ">>> [1/4] Eval Teacher with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config_2.yaml --main_process_port 0 "$gen"  \
-    hydra.run.dir=experiments_gpqa_cala/metadata/eval/lora_teacher_tau${tau}_delta${delta} \
-    is_teacher=true exp_dir=experiments_gpqa_cala answer_force=true tau=${tau} \
-    data_split=gpqa_test batch_size=256 trace_name=eval_teacher_lora_tau${tau}_delta${delta} seed=42 \
-    tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
-    teacher=${teacher} delta=${delta} max_samples=2880 max_length=1024 max_prompt_length=256
+    # echo ">>> [1/4] Eval Teacher with delta = ${delta} and tau = ${tau}..."
+    # accelerate launch --config_file acc_config_2.yaml --main_process_port 0 "$gen"  \
+    # hydra.run.dir=experiments_gpqa_cala/metadata/eval/lora_teacher_tau${tau}_delta${delta} \
+    # is_teacher=true exp_dir=experiments_gpqa_cala answer_force=true tau=${tau} \
+    # data_split=gpqa_test batch_size=256 trace_name=eval_teacher_lora_tau${tau}_delta${delta} seed=42 \
+    # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
+    # teacher=${teacher} delta=${delta} max_samples=2880 max_length=1024 max_prompt_length=256
 
     echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
     python "$gen" \
     trace_name=teacher_lora_tau${tau}_delta${delta} \
-    trace_path=.experiments_gpqa_cala/traces_mmlu/teacher_lora_tau${tau}_delta${delta} \
+    trace_path=experiments_gpqa_cala/traces_mmlu/teacher_lora_tau${tau}_delta${delta} \
     data_split=mmlu_train \
     teacher=${teacher} \
     tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
