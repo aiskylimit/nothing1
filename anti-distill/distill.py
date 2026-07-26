@@ -135,6 +135,9 @@ def main(cfg: DictConfig):
         eos_token = tokenizer.eos_token
         special_tokens = {"pad_token": "[PAD]"}
         tokenizer.add_special_tokens(special_tokens)
+    elif "gemma" in cfg.tokenizer.lower():
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
     else:
         raise ValueError(f"Unknown tokenizer {cfg.tokenizer}")
 

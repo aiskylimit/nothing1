@@ -1,6 +1,6 @@
 #! /bin/bash
 
-GPUS=(0 4)
+GPUS=(0 1)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 
 MASTER_ADDR=localhost
@@ -33,9 +33,9 @@ EPOCHS=5
 # length
 MAX_LENGTH=640
 # runtime
-SAVE_PATH="${BASE_PATH}/results/DeepSeek-R1-Distill-Qwen-7B"
+SAVE_PATH="${BASE_PATH}/results/DeepSeek-R1-Distill-Qwen-7B-seed62"
 # seed
-SEED=42
+SEED=62
 
 
 OPTS=""

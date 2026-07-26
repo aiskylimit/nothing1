@@ -30,7 +30,7 @@ from transformers import logging as hf_logging
 
 import wandb
 from utils import (ANSWER_FORCE_STRING, SYSTEM_PROMPT, MMLU_SYSTEM_PROMPT, init, load_gsm8k,
-                   load_hendrycks_math_dataset, load_mmlu)
+                   load_hendrycks_math_dataset, load_mmlu, load_gpqa)
 
 # ================================================================================
 # SETUP AND INITIALIZATION
@@ -209,6 +209,9 @@ def main(cfg: DictConfig):
         dataset = load_hendrycks_math_dataset(split=cfg.data_split.split("_")[2])
     elif "mmlu" in cfg.data_split:
         dataset = load_mmlu(split=cfg.data_split.split("_")[1])   
+        sys_prompt = MMLU_SYSTEM_PROMPT
+    elif "gpqa" in cfg.data_split:
+        dataset = load_gpqa(split=cfg.data_split.split("_")[1])   
         sys_prompt = MMLU_SYSTEM_PROMPT
     else:
         raise ValueError(f"Unknown dataset and split: {cfg.data_split}")
