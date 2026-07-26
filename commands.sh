@@ -1,4 +1,4 @@
-#1 +120
+#1 +10
 #anti-distill-2
 #v2
 
@@ -27,4 +27,4 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 cd ./anti-distill
 # # ls -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
