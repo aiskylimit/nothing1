@@ -13,11 +13,6 @@ set -euo pipefail
 #   ./copy_yaml.sh ./backup_yaml
 #-----------------------------------------------------
 
-if [[ $# -lt 1 ]]; then
-    echo "Cách dùng: $0 <thu_muc_dich>" >&2
-    exit 1
-fi
-
 DEST_DIR="${1:-results_yaml}"
 SRC_DIR="."
 
