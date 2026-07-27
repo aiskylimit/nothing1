@@ -28,6 +28,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 
 kill -9 2172258
+kill -9 2174848
 cd ./anti-distill
 rm -rf results_yaml
 bash ./collect_results.sh
