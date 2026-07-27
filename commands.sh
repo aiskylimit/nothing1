@@ -31,6 +31,8 @@ cd ./anti-distill
 # bash ./collect_results.sh
 ls experiments_gsm8k_7 -R
 ls experiments_gsm8k -R
+ls experiments_gpqa_cala -R
+ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
 
 
