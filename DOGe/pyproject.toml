@@ -117,7 +117,8 @@ dependencies = [
     "zstandard==0.23.0",
     "nvidia-cudnn-cu12",
     "nvidia-cusparselt-cu12",
-    "nvidia-nccl-cu12"
+    "nvidia-nccl-cu12",
+    "nvidia-cuda-runtime-cu12"
 ]
 
 [build-system]
