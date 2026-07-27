@@ -1,4 +1,4 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
+#1 +120
 #doge
 #v2
 
@@ -35,7 +35,7 @@ cd ./anti-distill
 # ls experiments_gsm8k -R
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
-# bash ./project_commands.sh
+bash ./project_commands.sh
 
 
 # cd ./DOGe

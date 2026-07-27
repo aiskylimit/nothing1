@@ -37,6 +37,7 @@ hf auth login --token "hf_${RAW}"
 bash ./script/eval/gsm8k/run_eval_4_doge.sh &
 bash ./script/eval/gsm8k/run_eval_5_doge.sh &
 bash ./script/eval/gsm8k/run_eval_6_doge.sh &
+bash ./script/eval/gsm8k_attack/run_eval_3.sh &
 wait
 
 rm -rf results_yaml
