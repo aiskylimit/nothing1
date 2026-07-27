@@ -109,7 +109,7 @@ def compute_dataset_ppl(dataset, model, tokenizer, batch_size=8, device="cuda"):
         
     dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_fn)
     
-    for inputs, masks in tqdm(dataloader, desc="Calculating Perplexity"):
+    for inputs, masks in dataloader:
         inputs = inputs.to(device)
         masks = masks.to(device)
         
