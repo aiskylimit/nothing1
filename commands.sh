@@ -1,4 +1,4 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gpqa_tau/traces/eval_teacher_lora_tau0.9_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gpqa_tau/traces/eval_teacher_lora_tau1.16_delta0.0/ +a
+#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_7/traces/eval_teacher_lora_tau0.9_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_7/traces/eval_teacher_lora_tau1.16_delta0.0/ +a
 #doge
 #v2
 
