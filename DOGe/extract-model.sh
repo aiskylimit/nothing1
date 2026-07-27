@@ -1,2 +1,2 @@
 python scripts/extract-doge-model-checkpoint.py \
-  --model_dir="outputs/qwen7b-doge-coef0.0001-temp2-epoch2-lr5e-5/checkpoint-114"
+  --model_dir="outputs/qwen7b-doge-coef0.001-temp2-head_proj0-epoch1-lr5e-5/checkpoint-49"

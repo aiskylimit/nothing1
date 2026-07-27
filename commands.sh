@@ -1,4 +1,4 @@
-#2 +a
+#1 +120
 #doge
 #v2
 
@@ -32,5 +32,6 @@ cd ./anti-distill
 # ls experiments_gsm8k_4 -R
 bash ./project_commands.sh
 
-# cd ./DOGe
+cd ./DOGe
+bash ./extract-model.sh
 # bash ./project_commands.sh
