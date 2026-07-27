@@ -21,8 +21,8 @@ hf auth login --token "hf_${RAW}"
 # bash ./script/eval/gsm8k/run_eval_2.sh &
 # bash ./script/eval/gsm8k/run_eval_3.sh &
 
-bash ./script/eval/gsm8k/run_eval_4.sh &
-bash ./script/eval/gsm8k/run_eval_5.sh &
+# bash ./script/eval/gsm8k/run_eval_4.sh &
+# bash ./script/eval/gsm8k/run_eval_5.sh &
 # bash ./script/eval/gpqa/run_eval_2.sh &
 # bash ./script/eval/gpqa/run_eval_3.sh &
 # bash ./script/train/train_teacher_lora.sh &
@@ -30,6 +30,8 @@ bash ./script/eval/gsm8k/run_eval_5.sh &
 # bash ./script/eval/gsm8k/run_eval_7.sh &
 
 wait
+
+bash ./script/eval/gpqa/run_eval_2.sh
 
 rm -rf results_yaml
 bash ./collect_results.sh

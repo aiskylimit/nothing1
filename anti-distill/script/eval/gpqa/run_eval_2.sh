@@ -4,7 +4,7 @@ gen="new_gentraces.py"
 teacher="./results/DeepSeek-R1-Distill-Qwen-7B/3841"
 
 pairs=(
-    "0.25 0.5"
+    # "0.25 0.5"
     "0.75 0.75"
     "0.8 0.5"
     "0.85 0.5"
@@ -25,17 +25,17 @@ for pair in "${pairs[@]}"; do
     # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
     # teacher=${teacher} delta=${delta} max_samples=2880 max_length=1024 max_prompt_length=256
 
-    echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
-    python "$gen" \
-    trace_name=teacher_lora_tau${tau}_delta${delta} \
-    trace_path=experiments_gpqa_cala/traces_mmlu/teacher_lora_tau${tau}_delta${delta} \
-    data_split=mmlu_train \
-    teacher=${teacher} \
-    tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
-    batch_size=256 \
-    max_length=1024 max_prompt_length=256  \
-    answer_force=true \
-    tau=${tau} seed=42 delta=${delta} max_samples=2880 
+    # echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
+    # python "$gen" \
+    # trace_name=teacher_lora_tau${tau}_delta${delta} \
+    # trace_path=experiments_gpqa_cala/traces_mmlu/teacher_lora_tau${tau}_delta${delta} \
+    # data_split=mmlu_train \
+    # teacher=${teacher} \
+    # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
+    # batch_size=256 \
+    # max_length=1024 max_prompt_length=256  \
+    # answer_force=true \
+    # tau=${tau} seed=42 delta=${delta} max_samples=2880 
 
     echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
     accelerate launch --config_file acc_config_2.yaml --main_process_port 0 distill.py \
