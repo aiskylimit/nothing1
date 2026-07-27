@@ -45,6 +45,7 @@ from rich.syntax import Syntax
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from transformers import logging as hf_logging
 from trl import DataCollatorForCompletionOnlyLM, SFTConfig, SFTTrainer
+from torch.utils.data import DataLoader
 
 import wandb
 from utils import SYSTEM_PROMPT, init
