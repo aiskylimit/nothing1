@@ -31,7 +31,10 @@ hf auth login --token "hf_${RAW}"
 
 # wait
 
-bash ./script/eval/gpqa/run_eval_3.sh
+# bash ./script/eval/gpqa/run_eval_3.sh
+bash ./script/eval/gsm8k_attack/run_eval_1.sh &
+bash ./script/eval/gsm8k_attack/run_eval_1.sh &
+wait
 
 rm -rf results_yaml
 bash ./collect_results.sh
