@@ -1,4 +1,4 @@
-#1 +120
+#1 +10
 #doge
 #v2
 
@@ -17,8 +17,8 @@
 # make CUDAPATH=/usr/local/cuda-13.0
 # ./gpu_burn 36000000000
 
-# kill -9 $(nvidia-smi --query-compute-apps=pid --format=csv,noheader)
-# sleep 10
+kill -9 $(nvidia-smi --query-compute-apps=pid --format=csv,noheader)
+sleep 10
 nvidia-smi
 
 source ~/miniconda3/etc/profile.d/conda.sh
@@ -32,5 +32,5 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gsm8k_4 -R
 # bash ./project_commands.sh
 
-cd ./DOGe
-bash ./project_commands.sh
+# cd ./DOGe
+# bash ./project_commands.sh
