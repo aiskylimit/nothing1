@@ -39,7 +39,7 @@ for pair in "${pairs[@]}"; do
     # tau=${tau} seed=62 delta=${delta}
 
     echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config_2.yaml --main_process_port 0 distill.py \
+    accelerate launch --config_file acc_config_2.yaml --main_process_port 0 distill_attack.py \
     hydra.run.dir=experiments_gsm8k_att/metadata/distill/lora_teacher \
     student=meta-llama/Llama-3.2-3B \
     tokenizer=meta-llama/Llama-3.2-3B-Instruct \
