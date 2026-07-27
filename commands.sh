@@ -1,4 +1,4 @@
-#1 +10
+#2 +a
 #doge
 #v2
 
@@ -29,10 +29,10 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 cd ./anti-distill
 # rm -rf results_yaml
 # bash ./collect_results.sh
-ls experiments_gsm8k_7 -R
-ls experiments_gsm8k -R
-ls experiments_gpqa_cala -R
-ls experiments_gpqa_tau -R
+# ls experiments_gsm8k_7 -R
+# ls experiments_gsm8k -R
+# ls experiments_gpqa_cala -R
+# ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
 
 
