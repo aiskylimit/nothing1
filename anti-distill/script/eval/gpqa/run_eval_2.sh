@@ -44,7 +44,7 @@ for pair in "${pairs[@]}"; do
     tokenizer=meta-llama/Llama-3.2-3B-Instruct \
     exp_dir=experiments_gpqa_cala \
     train_traces=experiments_gpqa_cala/traces_mmlu/teacher_lora_tau${tau}_delta${delta} \
-    holdout_traces=traces_holdout per_device_batch_siz=4 \
+    holdout_traces=traces_holdout per_device_batch_size=4 \
     model_name=student_manua_tau${tau}_delta${delta}
 
     echo ">>> [4/4] Eval Student model with delta = ${delta} and tau = ${tau}..."
