@@ -1,4 +1,4 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
+#1 +60
 #doge
 #v1
 
@@ -28,18 +28,18 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 
 
-cd ./anti-distill
+# cd ./anti-distill
 # rm -rf results_yaml
 # bash ./collect_results.sh
 # ls experiments_gsm8k_7 -R
 # ls experiments_gsm8k -R
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
 
 
-# cd ./DOGe
-# source .venv/bin/activate
-# export LD_LIBRARY_PATH=$PWD/.venv/lib/python3.10/site-packages/nvidia/cusparselt/lib:$LD_LIBRARY_PATH
-# bash ./extract-model.sh
+cd ./DOGe
+source .venv/bin/activate
+export LD_LIBRARY_PATH=$PWD/.venv/lib/python3.10/site-packages/nvidia/cusparselt/lib:$LD_LIBRARY_PATH
+bash ./extract-model.sh
 # bash ./project_commands.sh

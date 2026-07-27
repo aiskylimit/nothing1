@@ -26,7 +26,7 @@ max_grad_norm: 1.0
 warmup: 0.03
 lr_scheduler_type: cosine
 batch_size: 16
-per_device_batch_size: 8
+per_device_batch_size: 4
 num_epochs: 3
 
 # Output
