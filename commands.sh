@@ -1,4 +1,4 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
+#1 +10
 #anti-distill-2
 #v2
 
@@ -27,8 +27,8 @@ export PATH=/usr/local/cuda/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
 cd ./anti-distill
-# rm -rf results_yaml
-# bash ./collect_results.sh
+rm -rf results_yaml
+bash ./collect_results.sh
 # ls results/DeepSeek-R1-Distill-Qwen-7B-seed62 -R
 # ls experiments_gsm8k_4 -R
 # bash ./project_commands.sh
