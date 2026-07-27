@@ -26,9 +26,11 @@ conda activate base
 export PATH=/usr/local/cuda/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
+
+kill -9 2172258
 cd ./anti-distill
-# rm -rf results_yaml
-# bash ./collect_results.sh
+rm -rf results_yaml
+bash ./collect_results.sh
 # ls experiments_gsm8k_7 -R
 # ls experiments_gsm8k -R
 # ls experiments_gpqa_cala -R
