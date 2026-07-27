@@ -1,5 +1,5 @@
-#2
-#anti-distill-2
+#1 +120
+#doge
 #v2
 
 #2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
@@ -26,8 +26,11 @@ conda activate base
 export PATH=/usr/local/cuda/bin:$PATH
 export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 
-cd ./anti-distill
+# cd ./anti-distill
 # rm -rf results_yaml
 # bash ./collect_results.sh
 # ls experiments_gsm8k_4 -R
+# bash ./project_commands.sh
+
+cd ./DOGe
 bash ./project_commands.sh
