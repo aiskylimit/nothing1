@@ -32,6 +32,11 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gsm8k_4 -R
 # bash ./project_commands.sh
 
+kill -9 2078060
+kill -9 2078165
+kill -9 2078053
+
 cd ./DOGe
+source .venv/bin/activate
 bash ./extract-model.sh
 # bash ./project_commands.sh
