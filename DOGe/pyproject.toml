@@ -118,7 +118,8 @@ dependencies = [
     "nvidia-cudnn-cu12",
     "nvidia-cusparselt-cu12",
     "nvidia-nccl-cu12",
-    "nvidia-cuda-runtime-cu12"
+    "nvidia-cuda-runtime-cu12",
+    "nvidia-cuda-cupti-cu12
 ]
 
 [build-system]
