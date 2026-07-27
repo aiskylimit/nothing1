@@ -4,6 +4,7 @@ source .venv/bin/activate
 RAW="TwXoDncyxhVSoTFklwVXpsPaXzVipMJavD"
 export HF_TOKEN="hf_${RAW}"
 hf auth login --token "hf_${RAW}"
+export WANDB_DISABLED=True
 
 mkdir -p data/r1-qwen-7b
 

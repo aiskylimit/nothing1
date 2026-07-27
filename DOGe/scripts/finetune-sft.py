@@ -41,7 +41,7 @@ def train_sft(
         enable_lora: bool = False,
 ):
     accelerator = Accelerator(
-        gradient_accumulation_steps=gradient_accumulation_steps, project_dir=output_dir, log_with="wandb",
+        gradient_accumulation_steps=gradient_accumulation_steps, project_dir=output_dir,
         kwargs_handlers=[InitProcessGroupKwargs(timeout=Timedelta(hours=1))],
     )
     logging.basicConfig(
