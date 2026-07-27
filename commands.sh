@@ -1,4 +1,4 @@
-#2
+#1 +10
 #doge
 #v2
 
@@ -32,5 +32,5 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gsm8k_4 -R
 # bash ./project_commands.sh
 
-cd ./DOGe
-bash ./project_commands.sh
+# cd ./DOGe
+# bash ./project_commands.sh
