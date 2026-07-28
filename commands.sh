@@ -41,8 +41,8 @@ cd ./anti-distill
 bash ./project_commands.sh
 
 
-cd ./DOGe
-source .venv/bin/activate
-export LD_LIBRARY_PATH=$PWD/.venv/lib/python3.10/site-packages/nvidia/cusparselt/lib:$LD_LIBRARY_PATH
-bash ./extract-model.sh
+# cd ./DOGe
+# source .venv/bin/activate
+# export LD_LIBRARY_PATH=$PWD/.venv/lib/python3.10/site-packages/nvidia/cusparselt/lib:$LD_LIBRARY_PATH
+# bash ./extract-model.sh
 # bash ./project_commands.sh
