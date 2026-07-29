@@ -39,6 +39,7 @@ cd ./anti-distill
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
+source .venv/bin/activate
 python - <<'EOF'
 import torch
 
