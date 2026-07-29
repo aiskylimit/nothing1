@@ -1,4 +1,4 @@
-#2
+#1
 #doge
 #v2
 
@@ -31,14 +31,14 @@ cd ./DOGe
 bash ./extract-model.sh
 cd ..
 
-cd ./anti-distill
+# cd ./anti-distill
 # rm -rf results_yaml
 # bash ./collect_results.sh
 # ls experiments_gsm8k_7 -R
 # ls experiments_gsm8k -R
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
 
 
 # cd ./DOGe
