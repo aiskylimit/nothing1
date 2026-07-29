@@ -1,4 +1,4 @@
-#1 +10
+#1 +60
 #doge
 #v2
 
@@ -46,11 +46,12 @@ import torch
 print("torch:", torch.__version__)
 print("CUDA build:", torch.version.cuda)
 
+print("is_available:", torch.cuda.is_available())
+print("device_count:", torch.cuda.device_count())
+
 try:
-    print("is_available:", torch.cuda.is_available())
-    print("device_count:", torch.cuda.device_count())
     print("current_device:", torch.cuda.current_device())
-except Exception as e:
+except Exception:
     import traceback
     traceback.print_exc()
 EOF
