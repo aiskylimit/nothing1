@@ -4,14 +4,14 @@
 
 #2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
 
-# wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
-# sudo dpkg -i cuda-keyring_1.1-1_all.deb
-# sudo apt update
-# sudo apt-get install -y cuda-toolkit-13-0
-# echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
-# echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
-# source ~/.bashrc
-# bash install_miniconda.sh
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt update
+sudo apt-get install -y cuda-toolkit-13-0
+echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+bash install_miniconda.sh
 
 # cd gpu_burn
 # make CUDAPATH=/usr/local/cuda-13.0
@@ -31,7 +31,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # bash ./extract-model.sh
 # cd ..
 
-cd ./anti-distill
+# cd ./anti-distill
 # rm -rf results_yaml
 # bash ./collect_results.sh
 # ls experiments_gsm8k_7 -R
@@ -39,22 +39,7 @@ cd ./anti-distill
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
-source .venv/bin/activate
-python - <<'EOF'
-import torch
-
-print("torch:", torch.__version__)
-print("CUDA build:", torch.version.cuda)
-
-print("is_available:", torch.cuda.is_available())
-print("device_count:", torch.cuda.device_count())
-
-try:
-    print("current_device:", torch.cuda.current_device())
-except Exception:
-    import traceback
-    traceback.print_exc()
-EOF
+# source .venv/bin/activate
 
 
 # cd ./DOGe
