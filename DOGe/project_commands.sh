@@ -16,3 +16,4 @@ export LD_LIBRARY_PATH=$PWD/.venv/lib/python3.10/site-packages/nvidia/cusparselt
 
 bash train-doge.sh
 ls outputs -R
+bash ./extract-model.sh

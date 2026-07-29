@@ -1,6 +1,6 @@
 #! /bin/bash
 
-GPUS=(0 1)
+GPUS=(1)
 export CUDA_VISIBLE_DEVICES=$(IFS=,; echo "${GPUS[*]}")
 
 MASTER_ADDR=localhost
@@ -110,4 +110,5 @@ echo "PYTHONPATH=${PYTHONPATH}"
 mkdir -p ${SAVE_PATH}
 ${CMD}
 
-bash ./script/eval/gsm8k/run_eval_0.sh
+# bash ./script/eval/gsm8k/run_eval_0.sh
+bash ./script/eval/gsm8k_attack/run_eval_1.sh

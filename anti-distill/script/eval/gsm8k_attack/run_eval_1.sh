@@ -25,28 +25,28 @@ for pair in "${pairs[@]}"; do
     # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
     # teacher=${teacher} delta=${delta} max_samples=2880 
 
-    # echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
-    # python "$gen" \
-    # trace_name=teacher_lora_tau${tau}_delta${delta} \
-    # trace_path=./experiments_gsm8k_tau_att/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
-    # data_split=gsm8k_train \
-    # teacher=${teacher} \
-    # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
-    # batch_size=256 \
-    # max_length=1024 \
-    # max_prompt_length=512  \
-    # answer_force=true \
-    # tau=${tau} seed=62 delta=${delta}
+    echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
+    python "$gen" \
+    trace_name=teacher_lora_tau${tau}_delta${delta} \
+    trace_path=./experiments_gsm8k_tau_att/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
+    data_split=gsm8k_train \
+    teacher=${teacher} \
+    tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
+    batch_size=256 \
+    max_length=1024 \
+    max_prompt_length=512  \
+    answer_force=true \
+    tau=${tau} seed=62 delta=${delta}
 
-    # echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
-    # accelerate launch --config_file acc_config_1.yaml --main_process_port 0 distill_attack.py \
-    # hydra.run.dir=experiments_gsm8k_tau_att/metadata/distill/lora_teacher \
-    # student=meta-llama/Llama-3.2-3B \
-    # tokenizer=meta-llama/Llama-3.2-3B-Instruct \
-    # exp_dir=experiments_gsm8k_tau_att \
-    # train_traces=experiments_gsm8k_7/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
-    # holdout_traces=traces_holdout \
-    # model_name=student_manua_tau${tau}_delta${delta} max_length=1025
+    echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
+    accelerate launch --config_file acc_config_1.yaml --main_process_port 0 distill_attack.py \
+    hydra.run.dir=experiments_gsm8k_tau_att/metadata/distill/lora_teacher \
+    student=meta-llama/Llama-3.2-3B \
+    tokenizer=meta-llama/Llama-3.2-3B-Instruct \
+    exp_dir=experiments_gsm8k_tau_att \
+    train_traces=experiments_gsm8k_7/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
+    holdout_traces=traces_holdout \
+    model_name=student_manua_tau${tau}_delta${delta} max_length=1025
 
     echo ">>> [4/4] Eval Student model with delta = ${delta} and tau = ${tau}..."
     accelerate launch --config_file acc_config_1.yaml --main_process_port 0 student_eval.py  \
