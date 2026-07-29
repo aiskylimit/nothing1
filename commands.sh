@@ -1,4 +1,4 @@
-#1 +120
+#1 +10
 #doge
 #v2
 
@@ -38,7 +38,21 @@ cd ./anti-distill
 # ls experiments_gsm8k -R
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
+python - <<'EOF'
+import torch
+
+print("torch:", torch.__version__)
+print("CUDA build:", torch.version.cuda)
+
+try:
+    print("is_available:", torch.cuda.is_available())
+    print("device_count:", torch.cuda.device_count())
+    print("current_device:", torch.cuda.current_device())
+except Exception as e:
+    import traceback
+    traceback.print_exc()
+EOF
 
 
 # cd ./DOGe
