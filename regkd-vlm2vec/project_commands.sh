@@ -55,8 +55,8 @@ source vlm/bin/activate
 
 # wget https://huggingface.co/dangnguyens1/teacher_gradients/resolve/main/qwenvl_2b_cls_vqa_grad.zip
 # unzip qwenvl_2b_cls_vqa_grad.zip
-mv ./mnt/disk1/backup_user/dang.nh4/VLM_Embed/teacher_gradients ./teacher_gradients
-rm -rf qwenvl_2b_cls_vqa_grad.zip 
+# mv ./mnt/disk1/backup_user/dang.nh4/VLM_Embed/teacher_gradients ./teacher_gradients
+# rm -rf qwenvl_2b_cls_vqa_grad.zip 
 
 
 # =========================
