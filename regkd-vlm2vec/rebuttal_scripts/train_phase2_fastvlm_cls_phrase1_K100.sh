@@ -1,11 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+cd "$REPO_ROOT"
+export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
+if [[ ! -d "$REPO_ROOT/src/data" ]]; then
+    echo "Missing $REPO_ROOT/src/data. This checkout is incomplete; sync or commit the src/data package before training." >&2
+    exit 1
+fi
+
 NUM_GPUS_PER_NODE=1
+RUN_NAME=gvendi_phase2_cls_fastvlm_K100
 TRAIN_SCRIPT="gvendi_phase1.py"
 teacher_cache_dir="./teacher_gradients/qwen2b_cls_grad/"
 GVENDI_CODEBOOK_METHOD="${GVENDI_CODEBOOK_METHOD:-sinkhorn}"
 
 export TORCH_DISTRIBUTED_DEBUG=DETAIL
 
-export CUDA_VISIBLE_DEVICES=7
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-7}"
 
 # phase 1 training
 # torchrun --standalone \
@@ -50,8 +63,13 @@ export CUDA_VISIBLE_DEVICES=7
 
 # phase 2 training
 TRAIN_SCRIPT="train_distill_ddp.py"
+LOG_DIR="${TORCHRUN_LOG_DIR:-logs/torchrun/${RUN_NAME}}"
+mkdir -p "$LOG_DIR"
 torchrun --standalone \
-    --nproc_per_node=$NUM_GPUS_PER_NODE $TRAIN_SCRIPT \
+    --log-dir "$LOG_DIR" \
+    --redirects 3 \
+    --tee 3 \
+    --nproc_per_node=$NUM_GPUS_PER_NODE "$TRAIN_SCRIPT" \
     --model_name apple/FastVLM-0.5B \
     --teacher_model_name "raghavlite/B3_Qwen2_2B" \
     --lora True \
@@ -68,7 +86,7 @@ torchrun --standalone \
     --dataset_split "original" \
     --image_dir "vlm2vec_train/MMEB-train" \
     --percent_data 1.0 \
-    --output_dir "training/gvendi_phase2_cls_fastvlm_K100" \
+    --output_dir "training/${RUN_NAME}" \
     --per_device_train_batch_size 16 \
     --gradient_accumulation_steps 1 \
     --learning_rate 1e-4 \
@@ -87,7 +105,7 @@ torchrun --standalone \
     --image_resolution "low" \
     --projector_lr 5e-4 \
     --need_hash True \
-    --teacher_cache_dir $teacher_cache_dir \
+    --teacher_cache_dir "$teacher_cache_dir" \
     --gvendi_codebook_method "$GVENDI_CODEBOOK_METHOD" \
     --phase_1 False \
     --gvendi_K_codebook 100 \
