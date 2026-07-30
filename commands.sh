@@ -1,4 +1,4 @@
-#2 +a
+#1 +10
 #anti
 #v2
 
@@ -40,5 +40,6 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
 
-
+cd regkd-vlm2vec
+bash ./project_commands.sh
 
