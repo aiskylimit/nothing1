@@ -1,5 +1,5 @@
-#2
-#anti
+#1 +120
+#contra
 #v2
 
 #2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
@@ -40,6 +40,8 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
 
+cd contra-velocity-field-design
+bash ./project_commands.sh
 # cd regkd-vlm2vec
 # bash ./project_commands.sh
 
