@@ -16,32 +16,32 @@ for pair in "${pairs[@]}"; do
     echo " START PIPELINE WITH DELTA = ${delta} AND TAU = ${tau}"
     echo "=========================================================================="
 
-    echo ">>> [1/4] Eval Teacher with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config_6.yaml --main_process_port 0 student_eval.py  \
-    hydra.run.dir=experiments_gsm8k_doge_62/metadata/eval/teacher_tau${tau}_delta${delta} \
-    is_teacher=true exp_dir=experiments_gsm8k_doge_62 answer_force=true tau=${tau} \
-    data_split=gsm8k_test batch_size=128 trace_name=eval_teacher_lora_tau${tau}_delta${delta} seed=62 \
-    tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
-    teacher=${teacher} delta=${delta} max_samples=2880 
+    # echo ">>> [1/4] Eval Teacher with delta = ${delta} and tau = ${tau}..."
+    # accelerate launch --config_file acc_config_6.yaml --main_process_port 0 student_eval.py  \
+    # hydra.run.dir=experiments_gsm8k_doge_62/metadata/eval/teacher_tau${tau}_delta${delta} \
+    # is_teacher=true exp_dir=experiments_gsm8k_doge_62 answer_force=true tau=${tau} \
+    # data_split=gsm8k_test batch_size=128 trace_name=eval_teacher_lora_tau${tau}_delta${delta} seed=62 \
+    # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
+    # teacher=${teacher} delta=${delta} max_samples=2880 
 
-    echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
-    accelerate launch --config_file acc_config_6.yaml --main_process_port 0 student_eval.py \
-    trace_name=teacher_lora_tau${tau}_delta${delta} \
-    trace_path=./experiments_gsm8k_doge_62/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
-    data_split=gsm8k_train \
-    teacher=${teacher} \
-    tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
-    batch_size=128 \
-    max_length=1024 \
-    max_prompt_length=512  \
-    answer_force=true \
-    tau=${tau} seed=62 delta=${delta}
+    # echo ">>> [2/4] Gen Training Traces with delta = ${delta} and tau = ${tau}..."
+    # accelerate launch --config_file acc_config_6.yaml --main_process_port 0 student_eval.py \
+    # trace_name=teacher_lora_tau${tau}_delta${delta} \
+    # trace_path=./experiments_gsm8k_doge_62/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
+    # data_split=gsm8k_train \
+    # teacher=${teacher} \
+    # tokenizer=deepseek-ai/DeepSeek-R1-Distill-Qwen-7B \
+    # batch_size=128 \
+    # max_length=1024 \
+    # max_prompt_length=512  \
+    # answer_force=true \
+    # tau=${tau} seed=62 delta=${delta}
 
     echo ">>> [3/4] Training Student model with delta = ${delta} and tau = ${tau}..."
     accelerate launch --config_file acc_config_6.yaml --main_process_port 0 distill.py \
     hydra.run.dir=experiments_gsm8k_doge_62/metadata/distill/lora_teacher \
-    student=google/gemma-2b-it \
-    tokenizer=google/gemma-2b-it \
+    student=meta-llama/Llama-3.2-3B \
+    tokenizer=meta-llama/Llama-3.2-3B-Instruct \
     exp_dir=experiments_gsm8k_doge_62 \
     train_traces=experiments_gsm8k_doge_62/traces_gsm8k/teacher_lora_tau${tau}_delta${delta} \
     holdout_traces=traces_holdout \

@@ -1,7 +1,7 @@
 export CUDA_VISIBLE_DEVICES=1
 
 gen="new_gentraces.py"
-teacher="./results/DeepSeek-R1-Distill-Qwen-7B/3841"
+teacher="./results/DeepSeek-R1-Distill-Qwen-7B/7680"
 
 pairs=(
     "0.0 0.9"
