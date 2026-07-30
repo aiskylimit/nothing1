@@ -1,6 +1,6 @@
 #2 +a
 #anti
-#v1
+#v2
 
 #2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
 
@@ -31,14 +31,14 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # bash ./project_commands.sh
 
 
-cd ./anti-distill
+# cd ./anti-distill
 # rm -rf results_yaml
 # bash ./collect_results.sh
 # ls -R
 # ls experiments_gsm8k -R
 # ls experiments_gpqa_cala -R
 # ls experiments_gpqa_tau -R
-bash ./project_commands.sh
+# bash ./project_commands.sh
 
 
 
