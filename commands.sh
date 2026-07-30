@@ -1,4 +1,4 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge/traces/eval_teacher_lora_tau0.9_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge/traces/eval_teacher_lora_tau1.16_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge/traces/eval_teacher_lora_tau1.26_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge/traces/eval_teacher_lora_tau1.5_delta0.0/ +a
+#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge_62/traces/eval_teacher_lora_tau0.9_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge_62/traces/eval_teacher_lora_tau1.16_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge_62/traces/eval_teacher_lora_tau1.26_delta0.0/,/home/ubuntu/aiskylimit_nothing1/anti-distill/experiments_gsm8k_doge_62/traces/eval_teacher_lora_tau1.5_delta0.0/ +a
 #contra
 #v1
 
