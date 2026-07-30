@@ -16,8 +16,8 @@ set -e
 # =========================
 # 2. Create Python env and install requirements
 # =========================
-export UV_PROJECT_ENVIRONMENT=vlm
-uv sync
+# export UV_PROJECT_ENVIRONMENT=vlm
+# uv sync
 source vlm/bin/activate
 
 
@@ -27,9 +27,9 @@ source vlm/bin/activate
 # README says this step is optional.
 # Uncomment if you need eval images.
 
-wget https://huggingface.co/datasets/TIGER-Lab/MMEB-eval/resolve/main/images.zip
-unzip images.zip -d eval_images/
-rm -rf images.zip
+# wget https://huggingface.co/datasets/TIGER-Lab/MMEB-eval/resolve/main/images.zip
+# unzip images.zip -d eval_images/
+# rm -rf images.zip
 
 # =========================
 # 4. Optional train images
@@ -40,7 +40,7 @@ rm -rf images.zip
 # bash download_traindata.sh
 # bash download_traindata_2.sh
 
-python download.py
+# python download.py
 
 # =========================
 # 5. Optional teacher gradients
@@ -53,9 +53,9 @@ python download.py
 # mv /mnt/disk1/backup_user/dang.nh4/VLM_Embed/teacher_gradients ./teacher_gradients
 
 
-wget https://huggingface.co/dangnguyens1/teacher_gradients/resolve/main/qwenvl_2b_cls_vqa_grad.zip
-unzip qwenvl_2b_cls_vqa_grad.zip
-mv /mnt/disk1/backup_user/dang.nh4/VLM_Embed/teacher_gradients ./teacher_gradients
+# wget https://huggingface.co/dangnguyens1/teacher_gradients/resolve/main/qwenvl_2b_cls_vqa_grad.zip
+# unzip qwenvl_2b_cls_vqa_grad.zip
+mv ./mnt/disk1/backup_user/dang.nh4/VLM_Embed/teacher_gradients ./teacher_gradients
 rm -rf qwenvl_2b_cls_vqa_grad.zip 
 
 
@@ -77,9 +77,9 @@ python fix_lib.py
 #
 # bash scripts/test_gvendi.sh
 
-# bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_directGrad.sh &
-# bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_GradKD_only.sh &
-# bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K80.sh &
+bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_directGrad.sh &
+bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_GradKD_only.sh &
+bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K80.sh &
 bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K100.sh &
 wait
 
@@ -90,11 +90,11 @@ wait
 # =========================
 # Run 4 eval scripts in parallel, each one on a different GPU.
 
-# CUDA_VISIBLE_DEVICES=4 bash eval_scripts/eval_phase2_fastvlm_cls_directGrad.sh &
+CUDA_VISIBLE_DEVICES=4 bash eval_scripts/eval_phase2_fastvlm_cls_directGrad.sh &
 
-# CUDA_VISIBLE_DEVICES=5 bash eval_scripts/eval_phase2_fastvlm_cls_GradKD_only.sh &
+CUDA_VISIBLE_DEVICES=5 bash eval_scripts/eval_phase2_fastvlm_cls_GradKD_only.sh &
 
-# CUDA_VISIBLE_DEVICES=6 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K80.sh &
+CUDA_VISIBLE_DEVICES=6 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K80.sh &
 
 CUDA_VISIBLE_DEVICES=7 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K100.sh &
 
