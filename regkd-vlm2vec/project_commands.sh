@@ -77,10 +77,10 @@ python fix_lib.py
 #
 # bash scripts/test_gvendi.sh
 
-bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_directGrad.sh &
-bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_GradKD_only.sh &
-bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K80.sh &
-bash regkd-vlm2vec/rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K100.sh &
+bash ./rebuttal_scripts/train_phase2_fastvlm_cls_directGrad.sh &
+bash ./rebuttal_scripts/train_phase2_fastvlm_cls_GradKD_only.sh &
+bash ./rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K80.sh &
+bash ./rebuttal_scripts/train_phase2_fastvlm_cls_phrase1_K100.sh &
 wait
 
 
