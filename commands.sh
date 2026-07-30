@@ -1,4 +1,4 @@
-#2 -0-10
+#2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
 #doge
 #v1
 
