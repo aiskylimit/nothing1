@@ -1,4 +1,4 @@
-#1 +10
+#1 +20
 #contra
 #v1
 
@@ -7,7 +7,7 @@
 # wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
 # sudo dpkg -i cuda-keyring_1.1-1_all.deb
 # sudo apt update
-sudo apt install -y zip unzip
+# sudo apt install -y zip unzip
 # sudo apt-get install -y cuda-toolkit-13-0
 # echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
 # echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
@@ -41,9 +41,9 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
 
-# cd contra-velocity-field-design
-# zip -r results_vf.zip results/gpt2/eval_main
-# du -sh results_vf.zip
+cd contra-velocity-field-design
+zip -r results_vf.zip results/gpt2/eval_main
+du -sh results_vf.zip
 # bash ./project_commands.sh
 
 # cd regkd-vlm2vec
