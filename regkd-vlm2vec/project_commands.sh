@@ -88,17 +88,25 @@ source vlm/bin/activate
 # =========================
 # 8. Eval
 # =========================
-# Run 4 eval scripts in parallel, each one on a different GPU.
+# Run 4 eval scripts in parallel for each batch size, each one on a different GPU.
+# Override this list when needed, for example:
+#   EVAL_BATCH_SIZES="24 12 6 3" bash project_commands.sh
+EVAL_BATCH_SIZES="${EVAL_BATCH_SIZES:-28 24 16 10}"
 
-# CUDA_VISIBLE_DEVICES=4 bash eval_scripts/eval_phase2_fastvlm_cls_directGrad.sh &
+for EVAL_BATCH_SIZE in ${EVAL_BATCH_SIZES}; do
+    export EVAL_BATCH_SIZE
+    echo "Running eval with batch size ${EVAL_BATCH_SIZE}"
 
-# CUDA_VISIBLE_DEVICES=5 bash eval_scripts/eval_phase2_fastvlm_cls_GradKD_only.sh &
+    CUDA_VISIBLE_DEVICES=4 bash eval_scripts/eval_phase2_fastvlm_cls_directGrad.sh &
 
-# CUDA_VISIBLE_DEVICES=6 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K80.sh &
+    CUDA_VISIBLE_DEVICES=5 bash eval_scripts/eval_phase2_fastvlm_cls_GradKD_only.sh &
 
-# CUDA_VISIBLE_DEVICES=7 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K100.sh &
+    CUDA_VISIBLE_DEVICES=6 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K80.sh &
 
-# wait
+    CUDA_VISIBLE_DEVICES=7 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K100.sh &
+
+    wait
+done
 
 
 # =========================
