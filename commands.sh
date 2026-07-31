@@ -1,4 +1,4 @@
-#2
+#2 -f-/home/ubuntu/aiskylimit_nothing1/regkd-vlm2vec/MMEB-evaloutputs/ +a
 #contra
 #v2
 
