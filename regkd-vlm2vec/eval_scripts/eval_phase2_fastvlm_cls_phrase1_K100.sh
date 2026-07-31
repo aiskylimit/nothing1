@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-cd "$REPO_ROOT"
-export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
-if [[ ! -d "$REPO_ROOT/src/data" ]]; then
-    echo "Missing $REPO_ROOT/src/data. This checkout is incomplete; sync or commit the src/data package before evaluation." >&2
-    exit 1
-fi
 
 NAME_CHECKPOINT=gvendi_phase2_cls_fastvlm_K100
 
@@ -24,5 +14,5 @@ python eval_mmeb.py \
     --subset_name  "ImageNet-1K" "N24News" "HatefulMemes" "VOC2007" "SUN397" \
     --dataset_split test \
     --per_device_eval_batch_size 32 \
-    --image_dir "VLM_Embed/eval_images" \
+    --image_dir "./eval_images" \
     --tgt_prefix_mod

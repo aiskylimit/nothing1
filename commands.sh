@@ -1,4 +1,4 @@
-#2 -0-10
+#1 +120
 #contra
 #v1
 
@@ -41,11 +41,11 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # ls experiments_gpqa_tau -R
 # bash ./project_commands.sh
 
-cd contra-velocity-field-design
-zip -r results_vf.zip results/gpt2/eval_main
-du -sh results_vf.zip
+# cd contra-velocity-field-design
+# zip -r results_vf.zip results/gpt2/eval_main
+# du -sh results_vf.zip
 # bash ./project_commands.sh
 
-# cd regkd-vlm2vec
-# bash ./project_commands.sh
+cd regkd-vlm2vec
+bash ./project_commands.sh
 

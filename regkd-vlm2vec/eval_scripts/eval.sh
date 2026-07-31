@@ -12,5 +12,5 @@ python eval_mmeb.py \
     --subset_name  "ImageNet-1K" "N24News" "HatefulMemes" "VOC2007" "SUN397" \
     --dataset_split test \
     --per_device_eval_batch_size 32 \
-    --image_dir "VLM_Embed/eval_images" \
+    --image_dir "./eval_images" \
     --tgt_prefix_mod
