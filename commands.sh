@@ -1,4 +1,4 @@
-#2 -f-/home/ubuntu/aiskylimit_nothing1/contra-velocity-field-design/results_vf.zip +a
+#2 -0-10
 #contra
 #v1
 
