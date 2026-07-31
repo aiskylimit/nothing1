@@ -90,12 +90,21 @@ source vlm/bin/activate
 # =========================
 # Run 4 eval scripts in parallel, each one on a different GPU.
 
-CUDA_VISIBLE_DEVICES=4 bash eval_scripts/eval_phase2_fastvlm_cls_directGrad.sh &
+# CUDA_VISIBLE_DEVICES=4 bash eval_scripts/eval_phase2_fastvlm_cls_directGrad.sh &
 
-CUDA_VISIBLE_DEVICES=5 bash eval_scripts/eval_phase2_fastvlm_cls_GradKD_only.sh &
+# CUDA_VISIBLE_DEVICES=5 bash eval_scripts/eval_phase2_fastvlm_cls_GradKD_only.sh &
 
-CUDA_VISIBLE_DEVICES=6 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K80.sh &
+# CUDA_VISIBLE_DEVICES=6 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K80.sh &
 
-CUDA_VISIBLE_DEVICES=7 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K100.sh &
+# CUDA_VISIBLE_DEVICES=7 bash eval_scripts/eval_phase2_fastvlm_cls_phrase1_K100.sh &
 
-wait
+# wait
+
+
+# =========================
+# 9. Copy JSON eval outputs
+# =========================
+
+JSON_FILTER_DESTINATION="${JSON_FILTER_DESTINATION:-./MMEB-evaloutputs-json}"
+
+python json_filter.py ./MMEB-evaloutputs "${JSON_FILTER_DESTINATION}" --overwrite
