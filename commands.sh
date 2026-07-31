@@ -1,6 +1,6 @@
 #2
 #contra
-#v2
+#v1
 
 #2 -f-/home/ubuntu/aiskylimit_nothing1/anti-distill/results_yaml/ +a
 
@@ -46,6 +46,6 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
 # du -sh results_vf.zip
 # bash ./project_commands.sh
 
-cd regkd-vlm2vec
-bash ./project_commands.sh
+# cd regkd-vlm2vec
+# bash ./project_commands.sh
 
